@@ -200,6 +200,32 @@
       transform: translateY(-3px);
     }
 
+    /* ── Campo "Outro" ── */
+    .outro-input {
+      display: none;
+      width: 100%;
+      margin-top: 12px;
+      animation: fadeUp 0.3s ease both;
+    }
+    .outro-input input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--pink-mid);
+      border-radius: 14px;
+      font-size: 16px;
+      font-family: 'Nunito', sans-serif;
+      background: #fff;
+      color: #444;
+      outline: none;
+    }
+    .outro-input label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--pink-dark);
+      margin-bottom: 6px;
+    }
+
     /* ── Tela de confirmação ── */
     .confirm-details {
       background: linear-gradient(135deg, #fce4ec, #f8bbd0);
@@ -293,6 +319,10 @@
       <h1 class="card-title" id="comida-titulo"></h1>
       <div style="height:12px"></div>
       <div class="food-grid" id="food-grid"></div>
+      <div class="outro-input" id="outro-wrap">
+        <label>Para onde? ✍️</label>
+        <input type="text" id="input-outro" placeholder="Conta aqui..." />
+      </div>
       <div style="height:18px"></div>
       <button class="btn-primary" id="btn-comida" onclick="confirmarComida()"></button>
     </div>
@@ -550,6 +580,16 @@ function construirGridComida(opcoes) {
       document.querySelectorAll('.food-item').forEach(f => f.classList.remove('selected'));
       div.classList.add('selected');
       escolhaComida = op.emoji + ' ' + op.nome;
+
+      // Mostra campo de texto se for "Outro"
+      const outroWrap = document.getElementById('outro-wrap');
+      if (op.nome === 'Outro') {
+        outroWrap.style.display = 'block';
+        document.getElementById('input-outro').focus();
+      } else {
+        outroWrap.style.display = 'none';
+        document.getElementById('input-outro').value = '';
+      }
     });
     grid.appendChild(div);
   });
@@ -560,6 +600,16 @@ function confirmarComida() {
   if (!escolhaComida) {
     alert('Escolhe o que você tá afim primeiro! 😋');
     return;
+  }
+
+  // Se escolheu "Outro", pega o texto digitado
+  if (escolhaComida.includes('Outro')) {
+    const textoOutro = document.getElementById('input-outro').value.trim();
+    if (!textoOutro) {
+      alert('Conta pra onde você quer ir! 😊');
+      return;
+    }
+    escolhaComida = '✨ ' + textoOutro;
   }
 
   const c = CONFIG.confirmacao;
