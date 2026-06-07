@@ -35,11 +35,14 @@ const CONFIG = {
     emoji: "😋",
     botao: "Escolhe primeiro",
     opcoes: [
-      { emoji: "🍔", nome: "Hambúrguer" },
-      { emoji: "🍝", nome: "Massa" },
+      { emoji: "🍔", nome: "Hambúrguer" },💖
       { emoji: "🍕", nome: "Pizza" },
+      { emoji: "💖", nome: "Cinema + Comida" },
+      { emoji: "!", nome: "Casa Manu" },
+      { emoji: "!", nome: "Casa Andrew" },
+      { emoji: "!", nome: "Ficar de chamego" },
+      { emoji: "!", nome: "Outro" },
       { emoji: "!", nome: "Andrew escolhe" },
-      { emoji: "?", nome: "Outro" },
     ],
   },
 
