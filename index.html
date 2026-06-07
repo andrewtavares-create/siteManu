@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>💌 Um convite especial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink-bg:    #fce4ec;
+      --pink-light: #f8bbd0;
+      --pink-mid:   #e91e8c;
+      --pink-dark:  #c2185b;
+      --card-bg:    rgba(255,255,255,0.75);
+      --shadow:     0 8px 32px rgba(233,30,140,0.15);
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--pink-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Corações flutuantes ── */
+    .hearts-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .heart {
+      position: absolute;
+      font-size: clamp(14px, 3vw, 28px);
+      animation: floatHeart linear infinite;
+      opacity: 0;
+      user-select: none;
+    }
+    @keyframes floatHeart {
+      0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.5; }
+      100% { transform: translateY(-10vh) rotate(20deg); opacity: 0; }
+    }
+
+    /* ── Container de telas ── */
+    #app {
+      position: relative;
+      z-index: 1;
+      width: min(420px, 95vw);
+      padding: 16px;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      animation: fadeUp 0.45s ease both;
+    }
+    .screen.active { display: flex; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 2px solid var(--pink-light);
+      border-radius: 24px;
+      padding: 32px 28px;
+      width: 100%;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .card-title {
+      font-size: clamp(22px, 6vw, 30px);
+      font-weight: 900;
+      color: var(--pink-dark);
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .card-sub {
+      font-size: 15px;
+      color: #a0526a;
+      margin-bottom: 4px;
+    }
+    .card-emoji-big {
+      font-size: 56px;
+      display: block;
+      margin: 10px 0;
+    }
+
+    /* ── Botão primário ── */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--pink-mid), var(--pink-dark));
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 14px 36px;
+      font-size: 17px;
+      font-weight: 800;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(233,30,140,0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+      width: 100%;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(233,30,140,0.45);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    /* ── Botão secundário (foge) ── */
+    .btn-no {
+      position: fixed;
+      background: #e0e0e0;
+      color: #888;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      transition: none;
+      z-index: 999;
+      pointer-events: none; /* JS adds back */
+    }
+
+    /* ── Botões de escolha (convite) ── */
+    .btn-group {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      position: relative;
+    }
+    .btn-group .btn-primary { flex: 1; }
+
+    /* ── Input de data/hora ── */
+    .field-group { width: 100%; text-align: left; }
+    .field-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--pink-dark);
+      margin-bottom: 6px;
+    }
+    .field-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--pink-light);
+      border-radius: 14px;
+      font-size: 16px;
+      font-family: 'Nunito', sans-serif;
+      background: #fff;
+      color: #444;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .field-group input:focus { border-color: var(--pink-mid); }
+
+    /* ── Grid de comidas ── */
+    .food-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+    }
+    .food-item {
+      background: #fff;
+      border: 2px solid var(--pink-light);
+      border-radius: 16px;
+      padding: 14px 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #a0526a;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.15s, background 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .food-item span.icon { font-size: 34px; }
+    .food-item:hover { transform: translateY(-3px); border-color: var(--pink-mid); }
+    .food-item.selected {
+      border-color: var(--pink-dark);
+      background: #fce4ec;
+      transform: translateY(-3px);
+    }
+
+    /* ── Tela de confirmação ── */
+    .confirm-details {
+      background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .confirm-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--pink-dark);
+    }
+    .confirm-row span.label { color: #a0526a; font-weight: 600; font-size: 13px; }
+
+    /* ── Mascote animado ── */
+    .mascot { font-size: 80px; animation: bounce 0.8s ease infinite alternate; }
+    @keyframes bounce {
+      from { transform: translateY(0) rotate(-3deg); }
+      to   { transform: translateY(-14px) rotate(3deg); }
+    }
+
+    /* ── Responsivo ── */
+    @media (max-width: 380px) {
+      .card { padding: 22px 16px; }
+      .food-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Corações flutuantes -->
+<div class="hearts-bg" id="heartsBg"></div>
+
+<div id="app">
+
+  <!-- ═══ TELA 1: Convite ═══ -->
+  <div class="screen active" id="screen-convite">
+    <div class="card">
+      <span class="card-emoji-big" id="convite-emoji"></span>
+      <h1 class="card-title" id="convite-titulo"></h1>
+      <div style="height:20px"></div>
+      <div class="btn-group">
+        <button class="btn-primary" id="btn-sim" onclick="irPara('reacao')"></button>
+      </div>
+    </div>
+    <!-- botão "Não" fixo que foge -->
+    <button class="btn-no" id="btn-nao"></button>
+  </div>
+
+  <!-- ═══ TELA 2: Reação ═══ -->
+  <div class="screen" id="screen-reacao">
+    <span class="mascot">🥳</span>
+    <div class="card">
+      <h1 class="card-title" id="reacao-titulo"></h1>
+      <p class="card-sub" id="reacao-sub"></p>
+      <div style="height:16px"></div>
+      <button class="btn-primary" id="btn-proximo" onclick="irPara('dataHora')"></button>
+    </div>
+  </div>
+
+  <!-- ═══ TELA 3: Data e hora ═══ -->
+  <div class="screen" id="screen-dataHora">
+    <div class="card">
+      <span class="card-emoji-big" id="data-emoji"></span>
+      <h1 class="card-title" id="data-titulo"></h1>
+      <div style="height:16px"></div>
+      <div class="field-group">
+        <label id="label-data"></label>
+        <input type="date" id="input-data" />
+      </div>
+      <div style="height:12px"></div>
+      <div class="field-group">
+        <label id="label-hora"></label>
+        <input type="time" id="input-hora" />
+      </div>
+      <div style="height:20px"></div>
+      <button class="btn-primary" id="btn-data" onclick="confirmarData()"></button>
+    </div>
+  </div>
+
+  <!-- ═══ TELA 4: Comida ═══ -->
+  <div class="screen" id="screen-comida">
+    <div class="card">
+      <span class="card-emoji-big" id="comida-emoji"></span>
+      <h1 class="card-title" id="comida-titulo"></h1>
+      <div style="height:12px"></div>
+      <div class="food-grid" id="food-grid"></div>
+      <div style="height:18px"></div>
+      <button class="btn-primary" id="btn-comida" onclick="confirmarComida()"></button>
+    </div>
+  </div>
+
+  <!-- ═══ TELA 5: Confirmação ═══ -->
+  <div class="screen" id="screen-confirmacao">
+    <div class="card">
+      <span class="card-emoji-big" id="conf-emoji"></span>
+      <h1 class="card-title" id="conf-titulo"></h1>
+      <p class="card-sub" id="conf-msg"></p>
+      <div style="height:16px"></div>
+      <div class="confirm-details">
+        <div class="confirm-row">
+          <span>📅</span>
+          <div>
+            <span class="label">Data</span><br/>
+            <span id="conf-data">—</span>
+          </div>
+        </div>
+        <div class="confirm-row">
+          <span>🕐</span>
+          <div>
+            <span class="label">Hora</span><br/>
+            <span id="conf-hora">—</span>
+          </div>
+        </div>
+        <div class="confirm-row">
+          <span>🍽️</span>
+          <div>
+            <span class="label">Rolê</span><br/>
+            <span id="conf-comida">—</span>
+          </div>
+        </div>
+      </div>
+      <div style="height:16px"></div>
+      <p class="card-sub" id="conf-rodape" style="font-size:17px; font-weight:800; color:var(--pink-dark)"></p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Configurações editáveis -->
+<script src="config.js"></script>
+
+<script>
+// ── Estado ──────────────────────────────────────────────────
+let escolhaData  = '';
+let escolhaHora  = '';
+let escolhaComida = '';
+
+// ── Inicialização ────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  aplicarConfig();
+  gerarCoracoes();
+  iniciarBotaoNao();
+});
+
+function aplicarConfig() {
+  const c = CONFIG;
+
+  // Tela 1
+  document.getElementById('convite-emoji').textContent  = c.convite.emoji;
+  document.getElementById('convite-titulo').textContent = c.convite.titulo;
+  document.getElementById('btn-sim').textContent        = c.convite.botaoSim;
+  document.getElementById('btn-nao').textContent        = c.convite.botaoNao;
+
+  // Tela 2
+  document.getElementById('reacao-titulo').textContent  = c.reacao.titulo;
+  document.getElementById('reacao-sub').textContent     = c.reacao.subtitulo;
+  document.getElementById('btn-proximo').textContent    = c.reacao.botaoProximo;
+
+  // Tela 3
+  document.getElementById('data-emoji').textContent     = c.dataHora.emoji;
+  document.getElementById('data-titulo').textContent    = c.dataHora.titulo;
+  document.getElementById('label-data').textContent     = c.dataHora.labelData;
+  document.getElementById('label-hora').textContent     = c.dataHora.labelHora;
+  document.getElementById('btn-data').textContent       = c.dataHora.botao;
+
+  // Defaults de data/hora
+  const hoje = new Date();
+  const amanha = new Date(hoje); amanha.setDate(hoje.getDate() + 1);
+  document.getElementById('input-data').value = amanha.toISOString().split('T')[0];
+  document.getElementById('input-hora').value = '19:00';
+
+  // Tela 4
+  document.getElementById('comida-emoji').textContent   = c.comida.emoji;
+  document.getElementById('comida-titulo').textContent  = c.comida.titulo;
+  document.getElementById('btn-comida').textContent     = c.comida.botao;
+  construirGridComida(c.comida.opcoes);
+
+  // Tela 5
+  document.getElementById('conf-emoji').textContent     = c.confirmacao.emoji;
+  document.getElementById('conf-titulo').textContent    = c.confirmacao.titulo;
+  document.getElementById('conf-msg').textContent       = c.confirmacao.mensagem;
+  document.getElementById('conf-rodape').textContent    = c.confirmacao.rodape;
+}
+
+// ── Corações flutuantes ──────────────────────────────────────
+function gerarCoracoes() {
+  const container = document.getElementById('heartsBg');
+  const symbols = ['🩷','💕','💗','💖','🌸','✨','💝','💓'];
+  for (let i = 0; i < 22; i++) {
+    const el = document.createElement('span');
+    el.className = 'heart';
+    el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    el.style.left     = Math.random() * 100 + 'vw';
+    el.style.animationDuration  = (7 + Math.random() * 10) + 's';
+    el.style.animationDelay     = (Math.random() * 12) + 's';
+    el.style.fontSize = (14 + Math.random() * 18) + 'px';
+    container.appendChild(el);
+  }
+}
+
+// ── Botão "Não" que foge ──────────────────────────────────────
+function iniciarBotaoNao() {
+  const btn = document.getElementById('btn-nao');
+  const margem = 20;
+
+  function posicaoAleatoria() {
+    const bw = btn.offsetWidth  || 100;
+    const bh = btn.offsetHeight || 44;
+    return {
+      x: margem + Math.random() * (window.innerWidth  - bw - margem * 2),
+      y: margem + Math.random() * (window.innerHeight - bh - margem * 2),
+    };
+  }
+
+  function moverBtn() {
+    const p = posicaoAleatoria();
+    btn.style.left = p.x + 'px';
+    btn.style.top  = p.y + 'px';
+  }
+
+  // Posição inicial
+  btn.style.left = (window.innerWidth / 2 + 20) + 'px';
+  btn.style.top  = (window.innerHeight / 2 + 30) + 'px';
+
+  // Desktop: foge do mouse
+  btn.addEventListener('mouseover', moverBtn);
+  btn.addEventListener('touchstart', (e) => { e.preventDefault(); moverBtn(); }, { passive: false });
+
+  btn.style.pointerEvents = 'auto';
+}
+
+// ── Navegação entre telas ────────────────────────────────────
+function irPara(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const alvo = document.getElementById('screen-' + id);
+  alvo.classList.add('active');
+
+  // Esconde botão "Não" depois do convite
+  if (id !== 'convite') {
+    document.getElementById('btn-nao').style.display = 'none';
+  }
+}
+
+// ── Confirmar data ───────────────────────────────────────────
+function confirmarData() {
+  const dataVal = document.getElementById('input-data').value;
+  const horaVal = document.getElementById('input-hora').value;
+
+  if (!dataVal || !horaVal) {
+    alert('Escolhe uma data e um horário primeiro! 🥺');
+    return;
+  }
+
+  const [ano, mes, dia] = dataVal.split('-');
+  const meses = ['janeiro','fevereiro','março','abril','maio','junho',
+                  'julho','agosto','setembro','outubro','novembro','dezembro'];
+  escolhaData = `${parseInt(dia)} de ${meses[parseInt(mes) - 1]} de ${ano}`;
+
+  const [h, m] = horaVal.split(':');
+  const hora24 = parseInt(h);
+  const ampm = hora24 >= 12 ? 'PM' : 'AM';
+  const hora12 = hora24 % 12 || 12;
+  escolhaHora = `${hora12}:${m} ${ampm}`;
+
+  irPara('comida');
+}
+
+// ── Grid de comida ────────────────────────────────────────────
+function construirGridComida(opcoes) {
+  const grid = document.getElementById('food-grid');
+  grid.innerHTML = '';
+  opcoes.forEach(op => {
+    const div = document.createElement('div');
+    div.className = 'food-item';
+    div.innerHTML = `<span class="icon">${op.emoji}</span><span>${op.nome}</span>`;
+    div.addEventListener('click', () => {
+      document.querySelectorAll('.food-item').forEach(f => f.classList.remove('selected'));
+      div.classList.add('selected');
+      escolhaComida = op.emoji + ' ' + op.nome;
+    });
+    grid.appendChild(div);
+  });
+}
+
+// ── Confirmar comida ──────────────────────────────────────────
+function confirmarComida() {
+  if (!escolhaComida) {
+    alert('Escolhe o que você tá afim primeiro! 😋');
+    return;
+  }
+
+  const c = CONFIG.confirmacao;
+  document.getElementById('conf-data').textContent   = escolhaData;
+  document.getElementById('conf-hora').textContent   = escolhaHora;
+  document.getElementById('conf-comida').textContent = escolhaComida;
+  document.getElementById('conf-msg').textContent    = c.mensagem + ' ' + escolhaHora + ', ' + c.mensagem2;
+
+  irPara('confirmacao');
+  lancarConfetes();
+}
+
+// ── Confetes na confirmação ───────────────────────────────────
+function lancarConfetes() {
+  const symbols = ['🩷','💖','✨','🎉','💝','🌸','💕'];
+  const container = document.getElementById('heartsBg');
+  for (let i = 0; i < 30; i++) {
+    const el = document.createElement('span');
+    el.className = 'heart';
+    el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.bottom = '0';
+    el.style.animationDuration = (3 + Math.random() * 4) + 's';
+    el.style.animationDelay   = Math.random() * 2 + 's';
+    el.style.fontSize = (18 + Math.random() * 20) + 'px';
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 8000);
+  }
+}
+</script>
+</body>
+</html>
