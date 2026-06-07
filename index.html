@@ -337,8 +337,16 @@
 
 <!-- Configurações editáveis -->
 <script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
+// ── EmailJS ──────────────────────────────────────────────────
+const EMAILJS_PUBLIC_KEY  = 'kzYAyLQ8rmDB87drw';
+const EMAILJS_SERVICE_ID  = 'service_obaiiah';
+const EMAILJS_TEMPLATE_ID = 'template_oxj1t5i';
+
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
 // ── Estado ──────────────────────────────────────────────────
 let escolhaData  = '';
 let escolhaHora  = '';
@@ -506,6 +514,13 @@ function confirmarComida() {
 
   irPara('confirmacao');
   lancarConfetes();
+
+  // Envia email com as respostas
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    data:   escolhaData,
+    hora:   escolhaHora,
+    comida: escolhaComida,
+  }).catch(() => {}); // silencia erros pra não atrapalhar a experiência dela
 }
 
 // ── Confetes na confirmação ───────────────────────────────────
